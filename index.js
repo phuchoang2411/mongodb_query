@@ -1,6 +1,6 @@
 import http from 'http';
 import url from 'url';
-import { MongoClient, ObjectId } from 'mongodb';
+import { MongoClient } from 'mongodb';
 import { handleProductsRoute, handleProductRoute } from './routes.js';
 
 // Replace the uri string with your connection string.
