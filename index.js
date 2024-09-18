@@ -36,18 +36,43 @@ const getProducts = async () => {
 };
 
 const server = http.createServer(async (req, res) => {
-  if (req.url === '/products' && req.method === 'GET') {
-    try {
-      const products = await getProducts();
-      res.writeHead(200, { 'Content-Type': 'application/json' });
-      res.end(JSON.stringify(products));
-    } catch (error) {
-      res.writeHead(500, { 'Content-Type': 'text/plain' });
-      res.end('Internal Server Error');
-    }
-  } else {
-    res.writeHead(404, { 'Content-Type': 'text/plain' });
-    res.end('Not Found');
+  console.log('Request URL: ', req.url);
+  switch (req.url) {
+    case '/products':
+      switch (req.method) {
+        case 'GET':
+          try {
+            const products = await getProducts();
+            res.writeHead(200, { 'Content-Type': 'application/json' });
+            res.end(JSON.stringify(products));
+          } catch (error) {
+            res.writeHead(500, { 'Content-Type': 'text/plain' });
+            res.end('Internal Server Error');
+          }
+          break;
+        default:
+          res.writeHead(405, { 'Content-Type': 'text/plain' });
+          res.end('Method Not Allowed');
+          break;
+      }
+      break;
+    case '/another-route':
+      switch (req.method) {
+        case 'GET':
+          // Handle another route
+          res.writeHead(200, { 'Content-Type': 'text/plain' });
+          res.end('This is another route');
+          break;
+        default:
+          res.writeHead(405, { 'Content-Type': 'text/plain' });
+          res.end('Method Not Allowed');
+          break;
+      }
+      break;
+    default:
+      res.writeHead(404, { 'Content-Type': 'text/plain' });
+      res.end('Not Found');
+      break;
   }
 });
 
