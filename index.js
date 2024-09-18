@@ -7,9 +7,10 @@ const uri =
 
 const client = new MongoClient(uri);
 
-async function getProducts() {
+const getProducts = async () => {
   try {
     await client.connect();
+
     const database = client.db('Store');
     const products = database.collection('products');
 
@@ -18,13 +19,21 @@ async function getProducts() {
     const productList = await products.find(query).toArray();
 
     // Convert ObjectId to string
+    console.log(
+      'Product List: ',
+      productList.map((product) => {
+        return { ...product, _id: product._id.toString() };
+      })
+    );
     return productList.map((product) => {
       return { ...product, _id: product._id.toString() };
     });
+  } catch (error) {
+    console.error('Error: ', error);
   } finally {
     await client.close();
   }
-}
+};
 
 const server = http.createServer(async (req, res) => {
   if (req.url === '/products' && req.method === 'GET') {
@@ -42,7 +51,7 @@ const server = http.createServer(async (req, res) => {
   }
 });
 
-const PORT = 3000;
+const PORT = 3001;
 
 server.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}`);
