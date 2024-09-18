@@ -12,7 +12,7 @@
   "license": "ISC",
   "dependencies": {
     "http": "^0.0.1-security",
-    "mongodb": "6.9"
+    "mongodb": "^6.9.0"
   },
   "type": "module",
   "devDependencies": {
