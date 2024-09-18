@@ -1,5 +1,6 @@
-import { MongoClient } from 'mongodb';
+import { MongoClient, ObjectId } from 'mongodb';
 import http from 'http';
+import url from 'url';
 
 // Replace the uri string with your connection string.
 const uri =
@@ -35,9 +36,32 @@ const getProducts = async () => {
   }
 };
 
+const getProductById = async (id) => {
+  try {
+    await client.connect();
+    const database = client.db('Store');
+    const products = database.collection('products');
+
+    // Query for a document by ID
+    const product = await products.findOne({
+      _id: ObjectId.createFromHexString(id),
+    });
+
+    // Convert ObjectId to string
+    return { ...product, _id: product._id.toString() };
+  } catch (error) {
+    console.error('Error: ', error);
+  } finally {
+    await client.close();
+  }
+};
+
 const server = http.createServer(async (req, res) => {
-  console.log('Request URL: ', req.url);
-  switch (req.url) {
+  const parsedUrl = url.parse(req.url, true);
+  const pathname = parsedUrl.pathname;
+  const query = parsedUrl.query;
+  console.log(req.method, pathname);
+  switch (pathname) {
     case '/products':
       switch (req.method) {
         case 'GET':
@@ -48,6 +72,34 @@ const server = http.createServer(async (req, res) => {
           } catch (error) {
             res.writeHead(500, { 'Content-Type': 'text/plain' });
             res.end('Internal Server Error');
+          }
+          break;
+        default:
+          res.writeHead(405, { 'Content-Type': 'text/plain' });
+          res.end('Method Not Allowed');
+          break;
+      }
+      break;
+    case '/product':
+      switch (req.method) {
+        case 'GET':
+          if (query.id) {
+            try {
+              const product = await getProductById(query.id);
+              if (product) {
+                res.writeHead(200, { 'Content-Type': 'application/json' });
+                res.end(JSON.stringify(product));
+              } else {
+                res.writeHead(404, { 'Content-Type': 'text/plain' });
+                res.end('Product Not Found');
+              }
+            } catch (error) {
+              res.writeHead(500, { 'Content-Type': 'text/plain' });
+              res.end('Internal Server Error');
+            }
+          } else {
+            res.writeHead(400, { 'Content-Type': 'text/plain' });
+            res.end('Bad Request: Missing Product ID');
           }
           break;
         default:
