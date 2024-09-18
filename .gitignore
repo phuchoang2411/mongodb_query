@@ -1,2 +1,4 @@
 /node_modules
 /packege-lock.json
+/.gitignore
+/yarn.lock
