@@ -2,10 +2,15 @@ import http from 'http';
 import url from 'url';
 import { MongoClient } from 'mongodb';
 import { handleProductsRoute, handleProductRoute } from './routes.js';
+import dotenv from 'dotenv';
 
 // Replace the uri string with your connection string.
-const uri =
-  'mongodb+srv://user1:vKwiJaOBgmoOP7XI@cluster0.xmvqwng.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0';
+
+// Load environment variables from .env file
+dotenv.config();
+
+// Use the environment variable for the MongoDB URI
+const uri = process.env.MONGODB_URI;
 
 const client = new MongoClient(uri);
 
