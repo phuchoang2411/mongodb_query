@@ -4,8 +4,6 @@ import { MongoClient } from 'mongodb';
 import { handleProductsRoute, handleProductRoute } from './routes.js';
 import dotenv from 'dotenv';
 
-// Replace the uri string with your connection string.
-
 // Load environment variables from .env file
 dotenv.config();
 
