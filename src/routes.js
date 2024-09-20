@@ -1,4 +1,4 @@
-import { getProducts, getProductById } from './services.js';
+import { getProducts, getProductById, deleteProductById } from './services.js';
 
 export const handleProductsRoute = async (req, res, client) => {
   switch (req.method) {
@@ -31,6 +31,26 @@ export const handleProductRoute = async (req, res, query, client) => {
           } else {
             res.writeHead(404, { 'Content-Type': 'text/plain' });
             res.end('Product Not Found');
+          }
+        } catch (error) {
+          res.writeHead(500, { 'Content-Type': 'text/plain' });
+          res.end('Internal Server Error');
+        }
+      } else {
+        res.writeHead(400, { 'Content-Type': 'text/plain' });
+        res.end('Bad Request: Missing Product ID');
+      }
+      break;
+    case 'DELETE':
+      if (query.id) {
+        try {
+          const result = await deleteProductById(query.id, client);
+          if (result.success) {
+            res.writeHead(200, { 'Content-Type': 'application/json' });
+            res.end(JSON.stringify(result));
+          } else {
+            res.writeHead(404, { 'Content-Type': 'text/plain' });
+            res.end(result.message);
           }
         } catch (error) {
           res.writeHead(500, { 'Content-Type': 'text/plain' });

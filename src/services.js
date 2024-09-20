@@ -35,3 +35,25 @@ export const getProductById = async (id, client) => {
     console.error('Error: ', error);
   }
 };
+
+export const deleteProductById = async (id, client) => {
+  try {
+    const database = client.db('Store');
+    const products = database.collection('products');
+
+    // Convert string ID to ObjectId
+    const objectId = ObjectId.createFromHexString(id);
+
+    // Delete the document by ID
+    const result = await products.deleteOne({ _id: objectId });
+
+    if (result.deletedCount === 1) {
+      return { success: true, message: 'Product deleted successfully' };
+    } else {
+      return { success: false, message: 'Product not found' };
+    }
+  } catch (error) {
+    console.error('Error: ', error);
+    return { success: false, message: 'An error occurred' };
+  }
+};
