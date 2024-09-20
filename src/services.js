@@ -2,7 +2,6 @@ import { ObjectId } from 'mongodb';
 
 export const getProducts = async (client) => {
   try {
-    await client.connect();
     const database = client.db('Store');
     const products = database.collection('products');
 
@@ -16,14 +15,11 @@ export const getProducts = async (client) => {
     });
   } catch (error) {
     console.error('Error: ', error);
-  } finally {
-    await client.close();
   }
 };
 
 export const getProductById = async (id, client) => {
   try {
-    await client.connect();
     const database = client.db('Store');
     const products = database.collection('products');
 
@@ -37,7 +33,5 @@ export const getProductById = async (id, client) => {
     return { ...product, _id: product._id.toString() };
   } catch (error) {
     console.error('Error: ', error);
-  } finally {
-    await client.close();
   }
 };

@@ -37,17 +37,25 @@ const server = http.createServer(async (req, res) => {
   const query = parsedUrl.query;
   console.log(req.method, pathname);
 
-  switch (pathname) {
-    case '/products':
-      await handleProductsRoute(req, res, client);
-      break;
-    case '/product':
-      await handleProductRoute(req, res, query, client);
-      break;
-    default:
-      res.writeHead(404, { 'Content-Type': 'text/plain' });
-      res.end('Not Found');
-      break;
+  try {
+    await client.connect();
+
+    switch (pathname) {
+      case '/products':
+        await handleProductsRoute(req, res, client);
+        break;
+      case '/product':
+        await handleProductRoute(req, res, query, client);
+        break;
+      default:
+        res.writeHead(404, { 'Content-Type': 'text/plain' });
+        res.end('Not Found');
+        break;
+    }
+  } catch (error) {
+    console.error('Error: ', error);
+    res.writeHead(500, { 'Content-Type': 'text/plain' });
+    res.end('Internal Server Error');
   }
 });
 
