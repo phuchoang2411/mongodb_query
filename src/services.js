@@ -57,3 +57,26 @@ export const deleteProductById = async (id, client) => {
     return { success: false, message: 'An error occurred' };
   }
 };
+
+export const addProduct = async (productData, client) => {
+  try {
+    const database = client.db('Store');
+    const products = database.collection('products');
+
+    // Insert the new product
+    const result = await products.insertOne(productData);
+
+    if (result.acknowledged) {
+      return {
+        success: true,
+        message: 'Product added successfully',
+        productId: result.insertedId.toString(),
+      };
+    } else {
+      return { success: false, message: 'Failed to add product' };
+    }
+  } catch (error) {
+    console.error('Error: ', error);
+    return { success: false, message: 'An error occurred' };
+  }
+};

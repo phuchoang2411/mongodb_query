@@ -1,4 +1,9 @@
-import { getProducts, getProductById, deleteProductById } from './services.js';
+import {
+  getProducts,
+  getProductById,
+  deleteProductById,
+  addProduct,
+} from './services.js';
 
 export const handleProductsRoute = async (req, res, client) => {
   switch (req.method) {
@@ -12,6 +17,7 @@ export const handleProductsRoute = async (req, res, client) => {
         res.end('Internal Server Error');
       }
       break;
+
     default:
       res.writeHead(405, { 'Content-Type': 'text/plain' });
       res.end('Method Not Allowed');
@@ -60,6 +66,23 @@ export const handleProductRoute = async (req, res, query, client) => {
         res.writeHead(400, { 'Content-Type': 'text/plain' });
         res.end('Bad Request: Missing Product ID');
       }
+      break;
+    case 'POST':
+      let body = '';
+      req.on('data', (chunk) => {
+        body += chunk.toString();
+      });
+      req.on('end', async () => {
+        try {
+          const productData = JSON.parse(body);
+          const result = await addProduct(productData, client);
+          res.writeHead(201, { 'Content-Type': 'application/json' });
+          res.end(JSON.stringify(result));
+        } catch (error) {
+          res.writeHead(400, { 'Content-Type': 'text/plain' });
+          res.end('Bad Request: Invalid JSON');
+        }
+      });
       break;
     default:
       res.writeHead(405, { 'Content-Type': 'text/plain' });
