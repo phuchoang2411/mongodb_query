@@ -80,3 +80,28 @@ export const addProduct = async (productData, client) => {
     return { success: false, message: 'An error occurred' };
   }
 };
+
+export const updateProductById = async (id, productData, client) => {
+  try {
+    const database = client.db('Store');
+    const products = database.collection('products');
+
+    // Convert string ID to ObjectId
+    const objectId = ObjectId.createFromHexString(id);
+
+    // Update the document by ID
+    const result = await products.updateOne(
+      { _id: objectId },
+      { $set: productData }
+    );
+
+    if (result.matchedCount === 1) {
+      return { success: true, message: 'Product updated successfully' };
+    } else {
+      return { success: false, message: 'Product not found' };
+    }
+  } catch (error) {
+    console.error('Error: ', error);
+    return { success: false, message: 'An error occurred' };
+  }
+};

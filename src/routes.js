@@ -3,6 +3,7 @@ import {
   getProductById,
   deleteProductById,
   addProduct,
+  updateProductById,
 } from './services.js';
 
 export const handleProductsRoute = async (req, res, client) => {
@@ -83,6 +84,37 @@ export const handleProductRoute = async (req, res, query, client) => {
           res.end('Bad Request: Invalid JSON');
         }
       });
+      break;
+    case 'PUT':
+      if (query.id) {
+        let body = '';
+        req.on('data', (chunk) => {
+          body += chunk.toString();
+        });
+        req.on('end', async () => {
+          try {
+            const productData = JSON.parse(body);
+            const result = await updateProductById(
+              query.id,
+              productData,
+              client
+            );
+            if (result.success) {
+              res.writeHead(200, { 'Content-Type': 'application/json' });
+              res.end(JSON.stringify(result));
+            } else {
+              res.writeHead(404, { 'Content-Type': 'text/plain' });
+              res.end(result.message);
+            }
+          } catch (error) {
+            res.writeHead(400, { 'Content-Type': 'text/plain' });
+            res.end('Bad Request: Invalid JSON');
+          }
+        });
+      } else {
+        res.writeHead(400, { 'Content-Type': 'text/plain' });
+        res.end('Bad Request: Missing Product ID');
+      }
       break;
     default:
       res.writeHead(405, { 'Content-Type': 'text/plain' });
