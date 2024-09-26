@@ -1,13 +1,18 @@
 import { ObjectId } from 'mongodb';
 
-export const getProducts = async (client) => {
+export const getProducts = async (client, page = 1, limit = 10) => {
   try {
     const database = client.db('Store');
     const products = database.collection('products');
 
     // Query for all documents
     const query = {};
-    const productList = await products.find(query).toArray();
+    const skip = (page - 1) * limit;
+    const productList = await products
+      .find(query)
+      .skip(skip)
+      .limit(limit)
+      .toArray();
 
     // Convert ObjectId to string
     return productList.map((product) => {

@@ -6,13 +6,36 @@ import {
   updateProductById,
 } from './services.js';
 
+const validateProductData = (data) => {
+  if (!data.name || typeof data.name !== 'string') {
+    return 'Invalid product name';
+  }
+  if (typeof data.price !== 'number' || data.price < 0) {
+    return 'Invalid product price';
+  }
+  return null;
+};
+
 export const handleProductsRoute = async (req, res, client) => {
   switch (req.method) {
     case 'GET':
       try {
-        const products = await getProducts(client);
+        const query = new URL(req.url, `http://${req.headers.host}`)
+          .searchParams;
+        const page = parseInt(query.get('page')) || 1;
+        const limit = parseInt(query.get('pageSize')) || 10;
+        const total = await client
+          .db('Store')
+          .collection('products')
+          .countDocuments();
+
+        const products = await getProducts(client, page, limit);
+        const response = {
+          total,
+          products,
+        };
         res.writeHead(200, { 'Content-Type': 'application/json' });
-        res.end(JSON.stringify(products));
+        res.end(JSON.stringify(response));
       } catch (error) {
         res.writeHead(500, { 'Content-Type': 'text/plain' });
         res.end('Internal Server Error');
